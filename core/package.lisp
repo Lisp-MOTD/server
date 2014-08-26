@@ -1,5 +1,11 @@
 (defpackage #:motd-server
   (:use #:cl)
+  (:export :*motd-db*
+           :motd-db
+           :retrieve-all-motds-after
+           :retrieve-most-recent-motds
+           :retrieve-all-proposed-motds
+           :retrieve-all-tags)
   (:export :create-message
            :create-authenticated-message
            :extract-authenticated-message)
@@ -14,3 +20,11 @@
            :add-tag
            :delete-tag
            :delete-message))
+(in-package :motd-server)
+
+(defvar *motd-db* nil
+  "Handle to the current database.")
+
+(defclass motd-db ()
+  ()
+  (:documentation "Base class for the MOTD database."))

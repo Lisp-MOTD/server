@@ -9,7 +9,7 @@
                (:static-file "UNLICENSE")
                (:module "core"
                 :components ((:file "package")
-                             (:file "db" :depends-on ("pacakge"))
+                             (:file "db" :depends-on ("package"))
                              (:file "api" :depends-on ("package"))
                              (:file "authenticate" :depends-on ("package"
                                                                 "db"

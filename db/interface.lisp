@@ -1,0 +1,1 @@
+(in-package :motd-server)

@@ -44,16 +44,16 @@
          ',name))))
 
 (def-prefix-handler motds/after (message-id)
-  (get-all-motds-after message-id))
+  (motd-server:get-all-motds-after message-id))
 
 (def-prefix-handler motds/most-recent (how-many-to-retrieve)
-  (get-most-recent-motds how-many-to-retrieve))
+  (motd-server:get-most-recent-motds how-many-to-retrieve))
 
 (def-prefix-handler motds/proposed ()
-  (get-all-proposed-messages))
+  (motd-server:get-all-proposed-messages))
 
 (def-prefix-handler tags/all ()
-  (get-all-tags))
+  (motd-server:get-all-tags))
 
 (defun start-server (&key (port 80))
   (net.aserve:start :port port))

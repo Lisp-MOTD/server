@@ -11,6 +11,8 @@
                 :components ((:file "package")
                              (:file "db" :depends-on ("package"))
                              (:file "api" :depends-on ("package"))
+                             (:file "types" :depends-on ("package"
+                                                         "api"))
                              (:file "authenticate" :depends-on ("package"
                                                                 "db"
                                                                 "api"))

@@ -37,9 +37,11 @@
      ) AS info ON msg.id = info.message_id
      WHERE msg.id IN ( SELECT p1.message_id
                          FROM published_messages AS p1
-                         WHERE timestamp > ( SELECT timestamp
-                                               FROM published_messages AS p2
-                                               WHERE p2.message_id = ? ) )")
+                         WHERE timestamp >
+                               IFNULL(( SELECT timestamp
+                                          FROM published_messages AS p2
+                                          WHERE p2.message_id = ? ), 0 ) )
+     ORDER BY pub.timestamp DESC")
 
 (defconstant +retrieve-recent-statement+
   "SELECT msg.id, msg.expiration,
@@ -57,7 +59,8 @@
      WHERE msg.id IN ( SELECT message_id
                          FROM published_messages
                          ORDER BY timestamp DESC
-                         LIMIT ? )")
+                         LIMIT ? )
+     ORDER BY pub.timestamp DESC")
 
 (defconstant +retrieve-proposed-statement+
   "SELECT msg.id, msg.expiration,
@@ -71,10 +74,12 @@
           FROM message_tags AS tag
      ) AS info ON msg.id = info.message_id
      WHERE msg.id NOT IN ( SELECT message_id
-                             FROM published_messages )")
+                             FROM published_messages )
+     ORDER BY msg.id DESC")
 
 (defconstant +retrieve-tags-statement+
-  "SELECT DISTINCT tag FROM message_tags")
+  "SELECT DISTINCT tag FROM message_tags
+   ORDER BY tag ASC")
 
 (defmethod initialize-instance :after ((db sqlite3-motd-db)
                                        &key
@@ -84,11 +89,11 @@
                              :database-name db-name)))
     ;; TODO: figure out how to make sure this is serialized
     (%db-handle handle db)
+    (ensure-schema-loaded db)
     (%retrieve-after (dbi:prepare handle +retrieve-after-statement+) db)
     (%retrieve-recent (dbi:prepare handle +retrieve-recent-statement+) db)
     (%retrieve-proposed (dbi:prepare handle +retrieve-proposed-statement+) db)
-    (%retrieve-tags (dbi:prepare handle +retrieve-tags-statement+) db)
-    (ensure-schema-loaded db)))
+    (%retrieve-tags (dbi:prepare handle +retrieve-tags-statement+) db)))
 
 (defparameter *schema*
   (list

@@ -1,6 +1,9 @@
 (in-package :motd-server)
 
-(defgeneric create-message (translations tags &optional expiration-date)
+(defgeneric create-message (translations tags &key
+                                                id
+                                                expiration
+                                                timestamp)
   (:documentation "Create a new message with the given TRANSLATIONS
 and TAGS.  The TRANSLATIONS must be a list of elements of the
 form (LANGAUGE . TEXT) where the LANGUAGE is a keyword identifying a

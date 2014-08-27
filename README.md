@@ -12,6 +12,10 @@ A message has:
 * An arbitrary number of tags associated with it
 * An optional(??) expiration date for the message
 
+A published message also has:
+
+* A published timestamp
+
 The server side needs to support:
 
 * Fetching the latest N MOTDs or all since a given message ID

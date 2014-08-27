@@ -9,5 +9,5 @@
 
 (defgeneric retrieve-all-motds-after (db message-id))
 (defgeneric retrieve-most-recent-motds (db how-many-to-retrieve))
-(defgeneric retrieve-all-proposed-messages (db))
+(defgeneric retrieve-all-proposed-motds (db))
 (defgeneric retrieve-all-tags (db))

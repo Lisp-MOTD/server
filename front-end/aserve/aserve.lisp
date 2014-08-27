@@ -1,4 +1,4 @@
-(in-package :motd-server)
+(in-package :motd-server-aserve)
 
 (defun extract-args-from-uri (prefix uri)
   (let* ((uri (puri:parse-uri uri))
@@ -24,7 +24,7 @@
           (handler-case
               (let ((args (extract-args-from-uri prefix
                                                  (net.aserve:request-uri req))))
-                (print (apply function args)))
+                (pprint (apply function args)))
             (error (err)
               (pprint err))))))))
 
@@ -50,7 +50,7 @@
   (motd-server:get-most-recent-motds how-many-to-retrieve))
 
 (def-prefix-handler motds/proposed ()
-  (motd-server:get-all-proposed-messages))
+  (motd-server:get-all-proposed-motds))
 
 (def-prefix-handler tags/all ()
   (motd-server:get-all-tags))

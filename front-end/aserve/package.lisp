@@ -1,3 +1,4 @@
 (defpackage #:motd-server-aserve
   (:use #:cl)
-  (:export))
+  (:export :start-server
+           :shutdown-server))

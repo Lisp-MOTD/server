@@ -1,2 +1,3 @@
 (defpackage #:motd-server-sqlite3
-  (:use :cl))
+  (:use :cl)
+  (:export :sqlite3-motd-db))

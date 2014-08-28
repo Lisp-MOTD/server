@@ -22,65 +22,6 @@
                   all of the tags currently in use."))
   (:documentation "Sqlite3 subclass of MOTD-DB."))
 
-(defconstant +retrieve-after-statement+
-  "SELECT msg.id, msg.expiration,
-          pub.timestamp,
-          info.language, info.text, info.tag
-     FROM messages AS msg
-     JOIN published_messages AS pub ON msg.id = pub.message_id
-     JOIN (
-        SELECT message_id, language, text, NULL AS tag
-          FROM message_translations AS trn
-        UNION
-        SELECT message_id, NULL AS language, NULL AS text, tag
-          FROM message_tags AS tag
-     ) AS info ON msg.id = info.message_id
-     WHERE msg.id IN ( SELECT p1.message_id
-                         FROM published_messages AS p1
-                         WHERE timestamp >
-                               IFNULL(( SELECT timestamp
-                                          FROM published_messages AS p2
-                                          WHERE p2.message_id = ? ), 0 ) )
-     ORDER BY pub.timestamp DESC")
-
-(defconstant +retrieve-recent-statement+
-  "SELECT msg.id, msg.expiration,
-          pub.timestamp,
-          info.language, info.text, info.tag
-     FROM messages AS msg
-     JOIN published_messages AS pub ON msg.id = pub.message_id
-     JOIN (
-        SELECT message_id, language, text, NULL AS tag
-          FROM message_translations AS trn
-        UNION
-        SELECT message_id, NULL AS language, NULL AS text, tag
-          FROM message_tags AS tag
-     ) AS info ON msg.id = info.message_id
-     WHERE msg.id IN ( SELECT message_id
-                         FROM published_messages
-                         ORDER BY timestamp DESC
-                         LIMIT ? )
-     ORDER BY pub.timestamp DESC")
-
-(defconstant +retrieve-proposed-statement+
-  "SELECT msg.id, msg.expiration,
-          info.language, info.text, info.tag
-     FROM messages AS msg
-     JOIN (
-        SELECT message_id, language, text, NULL AS tag
-          FROM message_translations AS trn
-        UNION
-        SELECT message_id, NULL AS language, NULL AS text, tag
-          FROM message_tags AS tag
-     ) AS info ON msg.id = info.message_id
-     WHERE msg.id NOT IN ( SELECT message_id
-                             FROM published_messages )
-     ORDER BY msg.id DESC")
-
-(defconstant +retrieve-tags-statement+
-  "SELECT DISTINCT tag FROM message_tags
-   ORDER BY tag ASC")
-
 (defmethod initialize-instance :after ((db sqlite3-motd-db)
                                        &key
                                          (db-name #P"./motd.sqlite3")
@@ -94,6 +35,16 @@
     (%retrieve-recent (dbi:prepare handle +retrieve-recent-statement+) db)
     (%retrieve-proposed (dbi:prepare handle +retrieve-proposed-statement+) db)
     (%retrieve-tags (dbi:prepare handle +retrieve-tags-statement+) db)))
+
+(defun open-sqlite3-motd-database (db-name)
+  "Create a handle to the sqlite3 database DB-NAME."
+  (make-instance 'sqlite3-motd-db :db-name db-name))
+
+(defun close-sqlite3-motd-database (db)
+  "Disconnect from the sqlite3 database with the handle DB."
+  (check-type db sqlite3-motd-db)
+  (dbi:disconnect (db-handle db))
+  (slot-makunbound db 'db-handle))
 
 (defparameter *schema*
   (list
@@ -150,10 +101,14 @@
       (2, \"EN\", \"Message 2\"),
       (2, \"FR\", \"Le Message Deux\"),
       (2, \"ES\", \"El Message Dos\"),
-      (3, \"EN\", \"Message 3\"),
-      (3, \"FR\", \"Le Message Trois\"),
-      (4, \"EN\", \"Message 4\"),
-      (5, \"EN\", \"Message 5\"),
+      (3, \"EN\", \"  July 2014 Quicklisp dist update now available
+    http://tinyurl.com/quicklisp-august-2014\"),
+      (3, \"FR\",
+\"  Juillet 2014 Quicklisp mise à jour de la distribution maintenant disponible
+    http://tinyurl.com/quicklisp-august-2014\"),
+      (4, \"EN\", \"  ILC 2014 -- Montreal, Canada -- August 15-17\"),
+      (5, \"EN\", \"  August 2014 Quicklisp dist update now available
+    http://tinyurl.com/quicklisp-august-2014\"),
       (6, \"EN\", \"Message 6\"),
       (7, \"EN\", \"Message 7\")"
 
@@ -161,9 +116,11 @@
       (1, \"COMMON-LISP\"),
       (2, \"EMACS-LISP\"),
       (3, \"COMMON-LISP\"),
-      (3, \"ILC\"),
+      (3, \"QUICKLISP\"),
       (4, \"COMMON-LISP\"),
+      (4, \"ILC\"),
       (5, \"COMMON-LISP\"),
+      (5, \"QUICKLISP\"),
       (7, \"COMMON-LISP\")"))
 
 (defun ensure-canned-data-loaded (db)

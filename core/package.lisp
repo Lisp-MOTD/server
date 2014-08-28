@@ -20,11 +20,3 @@
            :add-tag
            :delete-tag
            :delete-message))
-(in-package :motd-server)
-
-(defvar *motd-db* nil
-  "Handle to the current database.")
-
-(defclass motd-db ()
-  ()
-  (:documentation "Base class for the MOTD database."))

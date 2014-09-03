@@ -48,6 +48,8 @@
 
 (defparameter *schema*
   (list
+   "PRAGMA encoding = \"UTF-8\""
+
    "CREATE TABLE IF NOT EXISTS messages (
       id INTEGER PRIMARY KEY ASC AUTOINCREMENT,
       expiration INTEGER

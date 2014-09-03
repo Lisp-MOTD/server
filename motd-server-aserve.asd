@@ -5,7 +5,7 @@
   :author "Patrick Stein <pat@nklein.com>"
   :version "0.1.20140826"
   :license "unlicense"
-  :depends-on (:motd-server :aserve :split-sequence)
+  :depends-on (:motd-server :aserve :split-sequence :trivial-utf-8)
   :components ((:static-file "UNLICENSE")
                (:module "front-end/aserve"
                 :components ((:file "package")

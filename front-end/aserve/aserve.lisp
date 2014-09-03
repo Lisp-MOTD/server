@@ -18,15 +18,19 @@
 (defun make-prefix-handler (prefix function)
   (lambda (req ent)
     (net.aserve:with-http-response (req ent
-                                    :content-type "text/plain")
+                                    :content-type "text/plain;charset=utf-8")
       (net.aserve:with-http-body (req ent)
-        (let ((*standard-output* net.html.generator:*html-stream*))
-          (handler-case
-              (let ((args (extract-args-from-uri prefix
-                                                 (net.aserve:request-uri req))))
-                (pprint (apply function args)))
-            (error (err)
-              (pprint err))))))))
+        (write-sequence
+         (trivial-utf-8:string-to-utf-8-bytes
+          (with-output-to-string (*standard-output*)
+            (handler-case
+                (let ((args (extract-args-from-uri
+                             prefix
+                             (net.aserve:request-uri req))))
+                  (pprint (apply function args)))
+              (error (err)
+                (pprint err)))))
+         net.html.generator:*html-stream*)))))
 
 
 (defmacro def-prefix-handler (name (&rest lambda-list) &body body)

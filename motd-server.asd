@@ -5,6 +5,7 @@
   :author "Patrick Stein <pat@nklein.com>"
   :version "0.1.20140825"
   :license "unlicense"
+  :depends-on (:motd-commands)
   :components ((:static-file "README.md")
                (:static-file "UNLICENSE")
                (:module "core"

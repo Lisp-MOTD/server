@@ -58,3 +58,7 @@
 (defconstant +retrieve-tags-statement+
   "SELECT DISTINCT tag FROM message_tags
    ORDER BY tag ASC")
+
+(defconstant +retrieve-public-key-statement+
+  "SELECT public_key FROM public_keys
+   WHERE user_name = ?")

@@ -19,7 +19,11 @@
    (retrieve-tags :reader retrieve-tags
                   :writer %retrieve-tags
                   :documentation "Prepared statement for retrieving
-                  all of the tags currently in use."))
+                  all of the tags currently in use.")
+   (retrieve-public-key :reader retrieve-public-key
+                  :writer %retrieve-public-key
+                  :documentation "Prepared statement for retrieving
+                  a user's public key."))
   (:documentation "Sqlite3 subclass of MOTD-DB."))
 
 (defmethod initialize-instance :after ((db sqlite3-motd-db)
@@ -29,12 +33,16 @@
   (let ((handle (dbi:connect :sqlite3
                              :database-name db-name)))
     ;; TODO: figure out how to make sure this is serialized
+    ;; sqlite3 support two types of concurrency... serialized is the one
+    ;; where multiple threads can write to the same database handle.
     (%db-handle handle db)
     (ensure-schema-loaded db)
     (%retrieve-after (dbi:prepare handle +retrieve-after-statement+) db)
     (%retrieve-recent (dbi:prepare handle +retrieve-recent-statement+) db)
     (%retrieve-proposed (dbi:prepare handle +retrieve-proposed-statement+) db)
-    (%retrieve-tags (dbi:prepare handle +retrieve-tags-statement+) db)))
+    (%retrieve-tags (dbi:prepare handle +retrieve-tags-statement+) db)
+    (%retrieve-public-key (dbi:prepare handle +retrieve-public-key-statement+)
+                          db)))
 
 (defun open-sqlite3-motd-database (db-name)
   "Create a handle to the sqlite3 database DB-NAME."
@@ -66,6 +74,7 @@
       text TEXT,
 
       CONSTRAINT unique_translation UNIQUE (message_id, language)
+        ON CONFLICT REPLACE
     )"
 
    "CREATE TABLE IF NOT EXISTS message_tags (
@@ -73,10 +82,11 @@
       tag TEXT,
 
       CONSTRAINT unique_tag UNIQUE (message_id, tag)
+        ON CONFLICT IGNORE
     )"
 
    "CREATE TABLE IF NOT EXISTS public_keys (
-      user_name TEXT PRIMARY KEY,
+      user_name TEXT PRIMARY KEY ON CONFLICT REPLACE,
       public_key TEXT
     )"))
 

@@ -11,3 +11,5 @@
 (defgeneric retrieve-most-recent-motds (db how-many-to-retrieve))
 (defgeneric retrieve-all-proposed-motds (db))
 (defgeneric retrieve-all-tags (db))
+
+(defgeneric retrieve-public-key (db user-name))

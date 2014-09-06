@@ -1,12 +1,25 @@
 (in-package #:motd-server-sqlite3)
 
+(defun replace-all (string old new)
+  (map 'string
+       (lambda (ch)
+         (if (char= ch old)
+             new
+             ch))
+       string))
+
+(defun %column-name (keyword)
+  (intern (replace-all (string-downcase
+                        (symbol-name keyword))
+                       #\-
+                       #\_)
+          :keyword))
+
 (defmacro plist-bind ((&rest vars) plist &body body)
   (let ((plist-var (gensym "PLIST-")))
     `(let ((,plist-var ,plist))
        (let ,(mapcar #'(lambda (var)
-                         `(,var (getf ,plist-var ,(intern (string-downcase
-                                                           (symbol-name var))
-                                                          :keyword))))
+                         `(,var (getf ,plist-var ,(%column-name var))))
                      vars)
          ,@body))))
 
@@ -43,6 +56,15 @@
               (intern tag :keyword)))
           results))
 
+(defun results-to-public-keys (results)
+  (mapcar (lambda (entry)
+            (plist-bind (public-key) entry
+              (when public-key
+                (let ((*read-eval* nil))
+                  (with-input-from-string (*standard-input* public-key)
+                    (motd-commands:eval-command (read)))))))
+          results))
+
 (defmethod motd-server:retrieve-all-motds-after ((db sqlite3-motd-db)
                                                  message-id)
   (let ((results (dbi:execute (retrieve-after db) message-id)))
@@ -60,3 +82,7 @@
 (defmethod motd-server:retrieve-all-tags ((db sqlite3-motd-db))
   (let ((results (dbi:execute (retrieve-tags db))))
     (results-to-tags (dbi:fetch-all results))))
+
+(defmethod motd-server:retrieve-public-key ((db sqlite3-motd-db) user-name)
+  (let ((results (dbi:execute (retrieve-public-key db) user-name)))
+    (first (results-to-public-keys (dbi:fetch-all results)))))

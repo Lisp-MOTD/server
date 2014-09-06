@@ -5,7 +5,8 @@
            :retrieve-all-motds-after
            :retrieve-most-recent-motds
            :retrieve-all-proposed-motds
-           :retrieve-all-tags)
+           :retrieve-all-tags
+           :retrieve-public-key)
   (:export :create-message
            :create-authenticated-message
            :extract-authenticated-message)

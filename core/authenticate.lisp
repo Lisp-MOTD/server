@@ -1,46 +1,56 @@
 (in-package :motd-server)
 
-(defun generate-signature (payload author timestamp private-key)
-  (declare (ignore payload author timestamp private-key))
-  ;; TODO: really do this
-  0)
+(defgeneric create-signing-public-key (public-key)
+  (:method ((public-key motd-commands:dsa-public-key))
+    (adt:with-data (motd-commands:dsa-public-key p q g y) public-key
+      (ironclad:make-public-key :dsa :p p :q q :g g :y y))))
 
-(defun valid-signature-p (payload author timestamp signature)
-  (declare (ignore payload author timestamp signature))
-  ;; TODO: really do this
+(defun valid-signature-p (user-name bytes signature)
+  (let ((public-key (retrieve-public-key *motd-db* user-name)))
+    (when public-key
+      (adt:with-data (motd-commands:dsa-signature r s) signature
+        (ironclad:verify-signature (create-signing-public-key public-key)
+                                   (ironclad:digest-sequence :sha1 bytes)
+                                   (ironclad:make-dsa-signature r s))))))
+
+(defun authorized-p (user-name command)
+  (declare (ignore user-name command))  ; TODO: something more nuanced
   t)
 
-(defmethod create-authenticated-message ((payload string)
-                                         (author string)
-                                         private-key)
-  (with-output-to-string (*standard-output*)
-    (let* ((timestamp (get-universal-time))
-           (signature (generate-signature payload author
-                                          timestamp private-key)))
-      (pprint (list :authenticated-message
-                    :payload payload
-                    :author author
-                    :timestamp timestamp
-                    :signature signature)))))
-
-(defconstant +timestamp-tolerance+ 600)
-
-(defmethod extract-authenticated-message ((authenticated-message string))
+(defmethod extract-authenticated-message ((authenticated-message
+                                           motd-commands:authenticated-message)
+                                          &optional
+                                            (*command-time-threshold*
+                                             +default-command-time-threshold+))
   (handler-case
-      (with-input-from-string (*standard-input* authenticated-message)
-        (destructuring-bind (tag &rest p-list) (read)
-          (assert (eq tag :authenticated-message))
-          (let ((payload (getf p-list :payload))
-                (author (getf p-list :author))
-                (timestamp (getf p-list :timestamp))
-                (signature (getf p-list :signature)))
-            (check-type payload string)
-            (check-type author string)
-            (check-type timestamp integer)
-            (assert (< (- (get-universal-time) timestamp)
-                       +timestamp-tolerance+))
-            (unless (valid-signature-p payload author timestamp signature)
-              (error "Invalid message signature for author: ~A" author))
-            payload)))
+      (adt:with-data (motd-commands:authenticated-message
+                      user-name base64-bytes signature)
+          authenticated-message
+
+        (let ((utf-8-bytes (cl-base64:base64-string-to-usb8-array
+                            base64-bytes)))
+          (cond
+            ((not (valid-signature-p user-name utf-8-bytes signature))
+             (motd-commands:authentication-failed user-name))
+
+            (t
+             (adt:with-data (motd-commands:signed-message _ timestamp cmd)
+                 (motd-commands:eval-command
+                  (let ((*read-eval* nil)
+                        (utf-8-string (trivial-utf-8:utf-8-bytes-to-string
+                                       utf-8-bytes)))
+                    (with-input-from-string (*standard-input* utf-8-string)
+                      (read))))
+
+               (let ((delta-time (- (get-universal-time) timestamp)))
+                 (cond
+                   ((<= *command-time-threshold* (abs delta-time))
+                    (motd-commands:time-difference-too-great delta-time))
+
+                   ((not (authorized-p user-name cmd))
+                    (motd-commands:not-authorized user-name))
+
+                   (t
+                    cmd))))))))
     (error ()
-      authenticated-message)))
+      (motd-commands:decoding-error authenticated-message))))

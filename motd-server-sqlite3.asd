@@ -9,8 +9,10 @@
   :components ((:static-file "UNLICENSE")
                (:module "db/sqlite3"
                 :components ((:file "package")
+                             (:file "util" :depends-on ("package"))
                              (:file "queries" :depends-on ("package"))
                              (:file "sqlite3" :depends-on ("package"
                                                            "queries"))
                              (:file "retrieve" :depends-on ("package"
+                                                            "util"
                                                             "sqlite3"))))))

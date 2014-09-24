@@ -15,6 +15,51 @@
         (mapcar #'read-item
                 (rest (split-sequence:split-sequence #\/ suffix)))))))
 
+(defun get-posted-message (raw-msg)
+  (let ((*read-eval* nil))
+    (motd-server:extract-authenticated-message
+     (with-input-from-string (*standard-input* raw-msg)
+       (motd-commands:eval-command (read))))))
+
+(defun make-post-handler (function)
+  (lambda (req ent)
+    (net.aserve:with-http-response (req ent
+                                    :content-type "text/plain;charset=utf-8")
+      (net.aserve:with-http-body (req ent)
+        (write-sequence
+         (trivial-utf-8:string-to-utf-8-bytes
+          (with-output-to-string (*standard-output*)
+            (handler-case
+                (let ((msg (get-posted-message
+                            (net.aserve:request-query-value "command" req))))
+                  (pprint (funcall function msg)))
+              (error (err)
+                (pprint err)))))
+         net.html.generator:*html-stream*)))))
+
+(defmacro def-post-handler (name msg-type (&rest args) &body body)
+  (let ((path (gensym "PATH-")))
+    `(let ((,path ,(concatenate 'string
+                                "/"
+                                (string-downcase (symbol-name name)))))
+       (progn
+         (defun ,name (,@args)
+           ,@body)
+         (flet ((destructurer (msg)
+                  (cond
+                    ((typep msg ',msg-type)
+                     (adt:with-data (,msg-type ,@args) msg
+                       (funcall #',name ,@args)))
+
+                    ((motd-commands:motd-general-error-p msg)
+                     msg)
+
+                    (t
+                     (motd-commands:decoding-error msg)))))
+           (net.aserve:publish
+            :path ,path
+            :function (make-post-handler #'destructurer)))))))
+
 (defun make-prefix-handler (prefix function)
   (lambda (req ent)
     (net.aserve:with-http-response (req ent
@@ -58,6 +103,10 @@
 
 (def-prefix-handler tags/all ()
   (motd-server:get-all-tags))
+
+(def-post-handler motds/add-translation motd-commands:add-translation
+    (message-id language text)
+  (motd-server:add-translation message-id language text))
 
 (defun start-server (&key (port 80))
   (net.aserve:start :port port))

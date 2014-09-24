@@ -58,6 +58,8 @@
   (list
    "PRAGMA encoding = \"UTF-8\""
 
+   "PRAGMA foreign_keys = ON"
+
    "CREATE TABLE IF NOT EXISTS messages (
       id INTEGER PRIMARY KEY ASC AUTOINCREMENT,
       expiration INTEGER

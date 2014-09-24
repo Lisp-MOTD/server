@@ -13,3 +13,5 @@
 (defgeneric retrieve-all-tags (db))
 
 (defgeneric retrieve-public-key (db user-name))
+
+(defgeneric insert-translation (db message-id language text))

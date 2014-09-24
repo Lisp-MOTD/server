@@ -19,7 +19,10 @@
                                                                 "api"))
                              (:file "retrieve" :depends-on ("package"
                                                             "db"
-                                                            "api"))))))
+                                                            "api"))
+                             (:file "insert" :depends-on ("package"
+                                                          "db"
+                                                          "api"))))))
 
 (defmethod asdf:perform ((op asdf:test-op)
                          (system (eql (asdf:find-system '#:motd-server))))

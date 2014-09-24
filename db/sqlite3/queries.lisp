@@ -62,3 +62,7 @@
 (defconstant +retrieve-public-key-statement+
   "SELECT public_key FROM public_keys
    WHERE user_name = ?")
+
+(defconstant +insert-translation-statement+
+  "INSERT INTO message_translations (message_id,language,text)
+   VALUES (?,?,?)")

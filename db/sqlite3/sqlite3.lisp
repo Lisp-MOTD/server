@@ -30,7 +30,13 @@
    (retrieve-public-key :reader retrieve-public-key
                   :writer %retrieve-public-key
                   :documentation "Prepared statement for retrieving
-                  a user's public key."))
+                  a user's public key.")
+
+   (get-last-inserted-message-id :reader get-last-inserted-message-id
+                                 :writer %get-last-inserted-message-id
+                                 :documentation "Retrieve the
+                                 message_id of the last message
+                                 inserted into the messages table."))
   (:documentation "Sqlite3 subclass of MOTD-DB."))
 
 (defmethod initialize-instance :after ((db sqlite3-motd-db)
@@ -49,7 +55,10 @@
     (%retrieve-proposed (dbi:prepare handle +retrieve-proposed-statement+) db)
     (%retrieve-tags (dbi:prepare handle +retrieve-tags-statement+) db)
     (%retrieve-public-key (dbi:prepare handle +retrieve-public-key-statement+)
-                          db)))
+                          db)
+    (%get-last-inserted-message-id
+     (dbi:prepare handle +get-last-inserted-message-id-statement+)
+     db)))
 
 (defun open-sqlite3-motd-database (db-name)
   "Create a handle to the sqlite3 database DB-NAME."

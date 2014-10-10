@@ -18,4 +18,5 @@
                                                             "sqlite3"))
                              (:file "insert" :depends-on ("package"
                                                           "util"
-                                                          "sqlite3"))))))
+                                                          "sqlite3"
+                                                          "retrieve"))))))

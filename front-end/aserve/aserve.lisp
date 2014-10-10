@@ -104,6 +104,10 @@
 (def-prefix-handler tags/all ()
   (motd-server:get-all-tags))
 
+(def-post-handler motds/propose-message motd-commands:new-motd
+    ()
+  (motd-server:new-motd))
+
 (def-post-handler motds/add-translation motd-commands:add-translation
     (message-id language text)
   (motd-server:add-translation message-id language text))
@@ -127,8 +131,6 @@
   (net.aserve:shutdown :server handle))
 
 #|
-(defgeneric propose-message (message))
-
 (defgeneric publish-message (message-id))
 
 (defgeneric delete-message (message-id))

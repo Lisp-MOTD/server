@@ -1,5 +1,8 @@
 (in-package :motd-server)
 
+(defmethod new-motd ()
+  (propose-message *motd-db*))
+
 (defmethod add-translation (message-id
                             (language string)
                             text)

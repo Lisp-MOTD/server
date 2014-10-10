@@ -63,6 +63,14 @@
   "SELECT public_key FROM public_keys
    WHERE user_name = ?")
 
+(defconstant +propose-message-statement+
+  "INSERT INTO messages
+   DEFAULT VALUES")
+
+(defconstant +get-last-inserted-message-id-statement+
+  "SELECT id FROM messages
+   WHERE rowid = last_insert_rowid()")
+
 (defconstant +insert-translation-statement+
   "INSERT INTO message_translations (message_id,language,text)
    VALUES (?,?,?)")

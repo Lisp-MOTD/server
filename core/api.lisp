@@ -33,7 +33,7 @@ universal time stamp after which this message is no longer relevant."))
 (defgeneric get-all-proposed-messages ())
 (defgeneric get-all-tags ())
 
-(defgeneric propose-message (message))
+(defgeneric new-motd ())
 
 (defgeneric publish-message (message-id))
 

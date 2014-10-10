@@ -7,6 +7,7 @@
            :retrieve-all-proposed-motds
            :retrieve-all-tags
            :retrieve-public-key)
+  (:export :new-motd)
   (:export :insert-translation
            :remove-translation)
   (:export :insert-tag

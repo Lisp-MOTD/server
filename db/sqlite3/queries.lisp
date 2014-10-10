@@ -66,3 +66,7 @@
 (defconstant +insert-translation-statement+
   "INSERT INTO message_translations (message_id,language,text)
    VALUES (?,?,?)")
+
+(defconstant +remove-translation-statement+
+  "DELETE FROM message_translations
+   WHERE message_id = ? AND language = ?")

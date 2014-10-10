@@ -26,14 +26,17 @@
           (push (intern tag :keyword)
                 (gethash id tags)))))
 
-    (mapcar (lambda (id)
-              (motd-server:create-message
-               (nreverse (gethash id translations))
-               (nreverse (gethash id tags))
-               :id id
-               :timestamp (gethash id timestamps)
-               :expiration (gethash id expirations)))
-            (nreverse ids))))
+    (remove nil
+            (mapcar (lambda (id)
+                      (let ((translations (gethash id translations)))
+                        (when translations
+                          (motd-server:create-message
+                           (nreverse translations)
+                           (nreverse (gethash id tags))
+                           :id id
+                           :timestamp (gethash id timestamps)
+                           :expiration (gethash id expirations)))))
+                    (nreverse ids)))))
 
 (defun results-to-tags (results)
   (mapcar (lambda (entry)

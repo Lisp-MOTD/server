@@ -22,6 +22,9 @@
                                                             "api"))
                              (:file "insert" :depends-on ("package"
                                                           "db"
+                                                          "api"))
+                             (:file "remove" :depends-on ("package"
+                                                          "db"
                                                           "api"))))))
 
 (defmethod asdf:perform ((op asdf:test-op)

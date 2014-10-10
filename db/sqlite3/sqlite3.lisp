@@ -1,5 +1,12 @@
 (in-package #:motd-server-sqlite3)
 
+(defmethod print-object ((db-error dbi.error:<dbi-database-error>) stream)
+  (if *print-pretty*
+      (format stream "DBI-DATABASE-ERROR(~A): ~A"
+              (slot-value db-error 'dbi.error::error-code)
+              (slot-value db-error 'dbi.error::message))
+      (call-next-method)))
+
 (defclass sqlite3-motd-db (motd-server:motd-db)
   ((db-handle :reader db-handle
               :writer %db-handle

@@ -15,3 +15,4 @@
 (defgeneric retrieve-public-key (db user-name))
 
 (defgeneric insert-translation (db message-id language text))
+(defgeneric remove-translation (db message-id language))

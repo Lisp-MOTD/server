@@ -6,8 +6,9 @@
            :retrieve-most-recent-motds
            :retrieve-all-proposed-motds
            :retrieve-all-tags
-           :retrieve-public-key
-           :insert-translation)
+           :retrieve-public-key)
+  (:export :insert-translation
+           :remove-translation)
   (:export :create-message
            :create-authenticated-message
            :extract-authenticated-message)

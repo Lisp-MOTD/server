@@ -70,3 +70,11 @@
 (defconstant +remove-translation-statement+
   "DELETE FROM message_translations
    WHERE message_id = ? AND language = ?")
+
+(defconstant +insert-tag-statement+
+  "INSERT INTO message_tags (message_id,tag)
+   VALUES (?,?)")
+
+(defconstant +remove-tag-statement+
+  "DELETE FROM message_tags
+   WHERE message_id = ? AND tag = ?")

@@ -9,3 +9,11 @@
                             (language symbol)
                             text)
   (add-translation message-id (symbol-name language) text))
+
+(defmethod add-tag (message-id
+                    (tag string))
+  (insert-tag *motd-db* message-id tag))
+
+(defmethod add-tag (message-id
+                    (tag symbol))
+  (add-tag message-id (symbol-name tag)))

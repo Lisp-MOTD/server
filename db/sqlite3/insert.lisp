@@ -8,3 +8,10 @@
               message-id
               language
               text))
+
+(defmethod motd-server:insert-tag ((db sqlite3-motd-db)
+                                   message-id
+                                   tag)
+  (dbi:do-sql (db-handle db) +insert-tag-statement+
+              message-id
+              tag))

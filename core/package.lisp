@@ -9,6 +9,8 @@
            :retrieve-public-key)
   (:export :insert-translation
            :remove-translation)
+  (:export :insert-tag
+           :remove-tag)
   (:export :create-message
            :create-authenticated-message
            :extract-authenticated-message)

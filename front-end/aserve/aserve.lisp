@@ -112,6 +112,14 @@
     (message-id language)
   (motd-server:delete-translation message-id language))
 
+(def-post-handler motds/add-tag motd-commands:add-tag
+    (message-id tag)
+  (motd-server:add-tag message-id tag))
+
+(def-post-handler motds/delete-tag motd-commands:delete-tag
+    (message-id tag)
+  (motd-server:delete-tag message-id tag))
+
 (defun start-server (&key (port 80))
   (net.aserve:start :port port))
 
@@ -122,11 +130,6 @@
 (defgeneric propose-message (message))
 
 (defgeneric publish-message (message-id))
-
-(defgeneric delete-translation (message-id language))
-
-(defgeneric add-tag (message-id tag))
-(defgeneric delete-tag (message-id tag))
 
 (defgeneric delete-message (message-id))
 |#

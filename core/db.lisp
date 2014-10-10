@@ -16,3 +16,6 @@
 
 (defgeneric insert-translation (db message-id language text))
 (defgeneric remove-translation (db message-id language))
+
+(defgeneric insert-tag (db message-id tag))
+(defgeneric remove-tag (db message-id tag))

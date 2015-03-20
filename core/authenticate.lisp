@@ -6,7 +6,7 @@
       (ironclad:make-public-key :dsa :p p :q q :g g :y y))))
 
 (defun valid-signature-p (user-name bytes signature)
-  (let ((public-key (retrieve-public-key *motd-db* user-name)))
+  (let ((public-key (retrieve-public-key =motd-db= *motd-db* user-name)))
     (when public-key
       (adt:with-data (motd-commands:dsa-signature r s) signature
         (ironclad:verify-signature (create-signing-public-key public-key)

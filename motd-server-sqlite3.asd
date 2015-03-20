@@ -5,7 +5,7 @@
   :author "Patrick Stein <pat@nklein.com>"
   :version "0.1.20140826"
   :license "unlicense"
-  :depends-on (:motd-server :dbd-sqlite3 :dbi)
+  :depends-on (:motd-server :interface :dbd-sqlite3 :dbi)
   :components ((:static-file "UNLICENSE")
                (:module "db/sqlite3"
                 :components ((:file "package")
@@ -19,4 +19,12 @@
                              (:file "insert" :depends-on ("package"
                                                           "util"
                                                           "sqlite3"
-                                                          "retrieve"))))))
+                                                          "retrieve"))
+                             (:file "remove" :depends-on ("package"
+                                                          "util"
+                                                          "sqlite3"))
+                             (:file "impl" :depends-on ("package"
+                                                        "sqlite3"
+                                                        "insert"
+                                                        "retrieve"
+                                                        "remove"))))))

@@ -53,24 +53,22 @@
                     (motd-commands:eval-command (read)))))))
           results))
 
-(defmethod motd-server:retrieve-all-motds-after ((db sqlite3-motd-db)
-                                                 message-id)
+(defun retrieve-all-motds-after (db message-id)
   (let ((results (dbi:execute (retrieve-after db) message-id)))
     (results-to-messages (dbi:fetch-all results))))
 
-(defmethod motd-server:retrieve-most-recent-motds ((db sqlite3-motd-db)
-                                                   how-many-to-retrieve)
+(defun retrieve-most-recent-motds (db how-many-to-retrieve)
   (let ((results (dbi:execute (retrieve-recent db) how-many-to-retrieve)))
     (results-to-messages (dbi:fetch-all results))))
 
-(defmethod motd-server:retrieve-all-proposed-motds ((db sqlite3-motd-db))
+(defun retrieve-all-proposed-motds (db)
   (let ((results (dbi:execute (retrieve-proposed db))))
     (results-to-messages (dbi:fetch-all results))))
 
-(defmethod motd-server:retrieve-all-tags ((db sqlite3-motd-db))
+(defun retrieve-all-tags (db)
   (let ((results (dbi:execute (retrieve-tags db))))
     (results-to-tags (dbi:fetch-all results))))
 
-(defmethod motd-server:retrieve-public-key ((db sqlite3-motd-db) user-name)
-  (let ((results (dbi:execute (retrieve-public-key db) user-name)))
+(defun retrieve-public-key (db user-name)
+  (let ((results (dbi:execute (retrieve-public-key-stmt db) user-name)))
     (first (results-to-public-keys (dbi:fetch-all results)))))

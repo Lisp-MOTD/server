@@ -1,13 +1,13 @@
 (in-package #:motd-server-sqlite3)
 
 (defmethod print-object ((db-error dbi.error:<dbi-database-error>) stream)
-  (if *print-pretty*
+  (if *print-readably*
+      (call-next-method)
       (format stream "DBI-DATABASE-ERROR(~A): ~A"
               (slot-value db-error 'dbi.error::error-code)
-              (slot-value db-error 'dbi.error::message))
-      (call-next-method)))
+              (slot-value db-error 'dbi.error::message))))
 
-(defclass sqlite3-motd-db (motd-server:motd-db)
+(defclass sqlite3-motd-db ()
   ((db-handle :reader db-handle
               :writer %db-handle
               :documentation "Handle to the sqlite3 database connection.")
@@ -27,7 +27,7 @@
                   :writer %retrieve-tags
                   :documentation "Prepared statement for retrieving
                   all of the tags currently in use.")
-   (retrieve-public-key :reader retrieve-public-key
+   (retrieve-public-key :reader retrieve-public-key-stmt
                   :writer %retrieve-public-key
                   :documentation "Prepared statement for retrieving
                   a user's public key.")

@@ -1,4 +1,4 @@
 (defpackage #:motd-server-sqlite3
   (:use :cl)
-  (:export :open-sqlite3-motd-database
-           :close-sqlite3-motd-database))
+  (:export :=sqlite3-motd-db=)
+  (:import-from :motd-server :make-=motd-db=-implementation))

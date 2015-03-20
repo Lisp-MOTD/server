@@ -1,23 +1,32 @@
 (in-package :motd-server)
 
+(defvar *motd-db-connection-info* nil
+  "The info required to open the *MOTD-DB* using the =MOTD-DB= interface.")
+
+(defvar =motd-db= nil
+  "Interface type for the current interface.")
+
 (defvar *motd-db* nil
   "Handle to the current database.")
 
-(defclass motd-db ()
-  ()
-  (:documentation "Base class for the MOTD database."))
+(interface:define-interface =motd-db= ()
+  (open-database (db-connection-info))
+  (close-database (handle))
+  (retrieve-all-motds-after (handle message-id))
+  (retrieve-most-recent-motds (handle how-many-to-retrieve))
+  (retrieve-all-proposed-motds (handle))
+  (retrieve-all-tags (handle))
+  (retrieve-public-key (handle user-name))
+  (propose-message (handle))
+  (insert-translation (handle message-id language text))
+  (remove-translation (handle message-id language))
+  (insert-tag (handle message-id tag))
+  (remove-tag (handle message-id tag)))
 
-(defgeneric retrieve-all-motds-after (db message-id))
-(defgeneric retrieve-most-recent-motds (db how-many-to-retrieve))
-(defgeneric retrieve-all-proposed-motds (db))
-(defgeneric retrieve-all-tags (db))
+(defun motd-open-database ()
+  (setf *motd-db* (open-database =motd-db= *motd-db-connection-info*)))
 
-(defgeneric retrieve-public-key (db user-name))
-
-(defgeneric propose-message (db))
-
-(defgeneric insert-translation (db message-id language text))
-(defgeneric remove-translation (db message-id language))
-
-(defgeneric insert-tag (db message-id tag))
-(defgeneric remove-tag (db message-id tag))
+(defun motd-close-database ()
+  (unwind-protect
+       (close-database =motd-db= *motd-db*)
+    (setf *motd-db* nil)))
